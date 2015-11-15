@@ -1,5 +1,3 @@
-# laravel-admin-proy
-ejemplo paso a paso en laravel 5.1 para generar un administrador de proyectos
 # Desarrollando un Administrador de Proyectos en Laravel 5.1
 
 ## Indice de Contenido
@@ -38,6 +36,7 @@ ejemplo paso a paso en laravel 5.1 para generar un administrador de proyectos
 		- [vista para mostrar un Proyecto **show** asociado a todas sus tareas **listaTareas**](#vista-para-mostrar-un-proyecto-show-asociado-a-todas-sus-tareas-listatareas)
 		- [vista de formulario para crear nuevo Proyecto](#vista-de-formulario-para-crear-nuevo-proyecto)
 		- [vista de formulario para modificar Proyecto](#vista-de-formulario-para-modificar-proyecto)
+
 <!-- /TOC -->
 
 ## Preparar la Aplicación
