@@ -1166,3 +1166,9 @@ Corremos las migraciones en el servidor de heroku
 ```
 heroku run php artisan migrate
 ```
+
+Lanzamos nuestra aplicaión en el navegador web
+
+```
+heroku open
+```
