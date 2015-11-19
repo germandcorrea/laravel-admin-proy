@@ -396,6 +396,14 @@ Route::get('auth/register', 'Auth\AuthController@getRegister');
 Route::post('auth/register', 'Auth\AuthController@postRegister');
 ```
 
+Por último debemos agregar la propiedad protegida **redirectPath** a la clase **AuthController** en el archivo **app/Http/Controllers/Auth/AuthController.php**, por convención despúes de autenticar los usuarios laravel redirege a la ruta **/dashboard** pero nosotros pretendemos que redirija a **/**.
+
+```
+
+protected $redirectPath = '/';
+```
+
+
 ### Vistas
 
 lo único que no incluye laravel por defecto son las vistas, entonces manos a la obra  a generar las vistas
@@ -768,6 +776,7 @@ class ProyectoController extends Controller
     $proyecto = Proyecto::findOrFail($id);
     $tarea = new Tarea();
     $tarea->tarea = $request->input("tarea");
+		$tarea->completo = false;
     $proyecto->tareas()->save($tarea);
     return redirect()->route('proyectos.show',$id)->with('message', 'Nueva Tarea Guardada!!!');
   }
@@ -924,70 +933,70 @@ creamos el archivo de vista **resources/views/proyectos/listaTareas.blade.php**
 ```
 
 <div class="row">
-	@if (count($tareas)>0)
-	<div class="panel panel-default">
-		<div class="panel-heading">
-			<h3>Tareas</h3>
-		</div>
-		<div class="panel-body">
-			<div class="">
-				<form class="nueva form-horizontal" action="{{ route('proyectos.storeTarea',$proyecto->id) }}" method="POST" >
-					{{ csrf_field() }}
-					<!-- tarea -->
-					<div class="form-group">
-						<label for="tarea" class="control-label col-sm-offset-1">Tarea</label>
-						<div class="input-group col-sm-offset-1 col-sm-10">
-							<input type="text" name="tarea" id="tarea" class="form-control" value="{{ old('tarea') }}" placeholder="nueva tarea">
-							<span class="input-group-btn">
-								<button class="btn btn-success" type="submit"><i class="fa fa-btn fa-plus"></i>agregar</button>
-							</span>
-						</div><!-- /input-group -->
-					</div> <!-- tarea -->
-				</form> <!-- /form.nueva -->
-			</div>
-			<table class="table table-striped">
-				<thead>
-				</thead>
-				<tbody>
-					@foreach ($tareas as $t)
-					<tr>
-						<td class="table-text">
-							<form class="modificar" action="{{route('proyectos.updateTarea',[$proyecto->id,$t->id])}}" method="POST">
-								{{ csrf_field() }}
-								{{ method_field('PUT') }}
-								<div class="checkbox">
-									<label>
-										<input
-											type="checkbox"
-											{{($t->completo==1)?'checked="checked"':''}}
-											name="completo"
-											value="1"
-											onclick="$(this).parent().parent().parent().submit()"
-											>
-										{{ $t->tarea }}
-									</label>
-								</div>
-							</form><!-- /form.modificar -->
-						</td>
-						<!-- eliminar -->
-						<td>
-							<form class="eliminar" action="{{route('proyectos.destroyTarea',[$proyecto->id,$t->id])}}" method="POST" onsubmit="return confirm('Está seguro de eliminar Tarea?')">
-								{{ csrf_field() }}
-								{{ method_field('DELETE') }}
-								<button type="submit" id="delete-task-{{ $t->id }}" class="btn btn-danger pull-right" title="Eliminar Tarea">
-									<i class="fa fa-trash"></i>
-								</button>
-							</form><!-- /form.eliminar -->
-						</td>
-					</tr>
-					@endforeach
-				</tbody>
-			</table>
-		</div>
-	</div>
-	@else
-	<h3>No Hay Tareas</h3>
-	@endif
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h3>Tareas</h3>
+    </div>
+    <div class="panel-body">
+      <div class="">
+        <form class="nueva form-horizontal" action="{{ route('proyectos.storeTarea',$proyecto->id) }}" method="POST" >
+          {{ csrf_field() }}
+          <!-- tarea -->
+          <div class="form-group">
+            <label for="tarea" class="control-label col-sm-offset-1">Tarea</label>
+            <div class="input-group col-sm-offset-1 col-sm-10">
+              <input type="text" name="tarea" id="tarea" class="form-control" value="{{ old('tarea') }}" placeholder="nueva tarea">
+              <span class="input-group-btn">
+                <button class="btn btn-success" type="submit"><i class="fa fa-btn fa-plus"></i>agregar</button>
+              </span>
+            </div><!-- /input-group -->
+          </div> <!-- tarea -->
+        </form> <!-- /form.nueva -->
+      </div>
+      @if (count($tareas)>0)
+      <table class="table table-striped">
+        <thead>
+        </thead>
+        <tbody>
+          @foreach ($tareas as $t)
+          <tr>
+            <td class="table-text">
+              <form class="modificar" action="{{route('proyectos.updateTarea',[$proyecto->id,$t->id])}}" method="POST">
+                {{ csrf_field() }}
+                {{ method_field('PUT') }}
+                <div class="checkbox">
+                  <label>
+                    <input
+                    type="checkbox"
+                    {{($t->completo==1)?'checked="checked"':''}}
+                    name="completo"
+                    value="1"
+                    onclick="$(this).parent().parent().parent().submit()"
+                    >
+                    {{ $t->tarea }}
+                  </label>
+                </div>
+              </form><!-- /form.modificar -->
+            </td>
+            <!-- eliminar -->
+            <td>
+              <form class="eliminar" action="{{route('proyectos.destroyTarea',[$proyecto->id,$t->id])}}" method="POST" onsubmit="return confirm('Está seguro de eliminar Tarea?')">
+                {{ csrf_field() }}
+                {{ method_field('DELETE') }}
+                <button type="submit" id="delete-task-{{ $t->id }}" class="btn btn-danger pull-right" title="Eliminar Tarea">
+                  <i class="fa fa-trash"></i>
+                </button>
+              </form><!-- /form.eliminar -->
+            </td>
+          </tr>
+          @endforeach
+        </tbody>
+      </table>
+      @else
+      <h3>No Hay Tareas</h3>
+      @endif
+    </div>
+  </div>
 </div>
 ```
 ### vista de formulario para crear nuevo Proyecto
@@ -1073,4 +1082,87 @@ creamos el archivo de vista **resources/views/proyectos/edit.blade.php**
 	</div>
 </div>
 @endsection
+```
+
+## Desplegar la aplicación en Heroku
+
+https://devcenter.heroku.com/articles/getting-started-with-laravel
+
+lo primero que necesitamos es una cuenta en heroku, es gratuito para eso hay que ir a la página de heroku.com y registarse.
+luego es necesario instalar la herramienta de linea de comandos para comunicarse con heroku.
+
+```
+
+wget -O- https://toolbelt.heroku.com/install-ubuntu.sh | sh
+```
+
+inciar Sesión en heroku, nos va a pedir el correo electronico y la passaword con la que nos registramos en el sitio.
+
+```
+
+heroku login
+```
+
+Generar el archivo **Procfile** donde indicamos que vamos a usar como servidor WEB una instancia de apache2 con php  configurado apuntando **DocumentRoot** al directorio **public** de nuestra aplicación.  
+
+```
+echo "web: vendor/bin/heroku-php-apache2 public/" > Procfile
+```
+
+Heroku como la mayoría de servicios web en la nube, utilizan **GIT** para subir los archivos al repositorio del servidor. por lo tanto es necesario iniciar un repositorio git dentro de nuestro proyecto **git init**, agregar todos los archivos del proyecto al repositorio **git add .** y por ultimo confirmar los que los archivos estan listos en nuestro repositorio **git commit -m "app: inicio de repositorio"**, todos esto es en nuestro repositorio local.
+
+```
+git init
+git add .
+git commit -m "app: inicio de repositorio"
+```
+
+crear la aplicación
+```
+heroku create adm-proy-app-germandcorrea
+```
+
+por defecto Heroku entiende que nuestra aplicación se va a desarrollar en **nodejs** de modo que debemos especificarle un build pack correspondientes a **PHP**
+
+```
+
+heroku buildpacks:set heroku/php
+```
+
+agregar PostgreSQL a nuestra aplicación en el servidor de heroku, luego podremos ver que en el heroku tenemos una variable de entorno **DATABASE_URL** que contiene los parámetros de conección hacia el servidor de base de datos.
+
+```
+heroku addons:create heroku-postgresql:hobby-dev
+```
+
+declaramos las variables que necesita laravel, para funcionar.
+configuramos las variables de entorno en el servidor de heroku, es decir las variables que teniamos definidas en nuestro archivo **.env** tienen que definirse como variables de entorno en los servidores de heroku.
+
+variables para la clave secreta de la aplicación.
+```
+
+heroku config:set APP_KEY=$(php artisan key:generate --show)
+```
+
+variables para la configuración de la Base de Datos.
+
+```
+export $(heroku config -s | grep DATABASE_URL)
+heroku config:set DB_CONNECTION=pgsql
+heroku config:set DB_HOST=$(php -r '$url=parse_url(getenv("DATABASE_URL")); echo $url["host"]; ')
+heroku config:set DB_USERNAME=$(php -r '$url=parse_url(getenv("DATABASE_URL")); echo $url["user"]; ')
+heroku config:set DB_PASSWORD=$(php -r '$url=parse_url(getenv("DATABASE_URL")); echo $url["pass"]; ')
+heroku config:set DB_DATABASE=$(php -r '$url=parse_url(getenv("DATABASE_URL")); echo substr($url["path"], 1);')
+```
+
+una vez configurada la application es hora de subir la aplicación al servidor de Heroku, nuevamente mediante **GIT**
+
+```
+
+git push heroku master
+```
+
+Corremos las migraciones en el servidor de heroku
+```
+heroku run php artisan migrate
 ```
